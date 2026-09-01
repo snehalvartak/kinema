@@ -9,9 +9,18 @@ point physically traces your curve. Then the machine animates, and you can expor
 No neural network. No training data. Pure mechanics + search, running in ~20 seconds
 on a dual-core laptop CPU.
 
+**Try it (no install, runs in your browser):** https://snehalvartak.github.io/kinema/
+**The benchmark: Evolution vs LLMs:** https://snehalvartak.github.io/kinema/benchmark.html
+
 ---
 
 ## Run it
+
+**Option A — nothing to install:** the client-side version runs on GitHub Pages:
+https://snehalvartak.github.io/kinema/ (JavaScript port of the engine, Web Worker, GIF export —
+no server involved).
+
+**Option B — full Python version** (identical app, adds server-side streaming + polish stages):
 
 ```powershell
 python -m pip install numpy scipy matplotlib fastapi "uvicorn[standard]" imageio
