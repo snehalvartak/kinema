@@ -1,0 +1,332 @@
+{
+ "llm": {
+  "z-ai/glm-4.5-air": {
+   "ellipse": {
+    "attempts": [
+     {
+      "params": [
+       1.0,
+       1.8,
+       1.8,
+       2.5,
+       0.4,
+       0.7,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": true,
+      "index_loss": 0.010898,
+      "chamfer": 0.228957,
+      "seconds": 55.0,
+      "error": null
+     },
+     {
+      "params": [
+       1.0,
+       2.8,
+       2.8,
+       2.5,
+       1.8,
+       1.2,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": true,
+      "index_loss": 0.073154,
+      "chamfer": 0.270037,
+      "seconds": 62.6,
+      "error": null
+     },
+     {
+      "params": [
+       1.0,
+       2.5,
+       2.0,
+       3.5,
+       -0.8,
+       0.5,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": true,
+      "index_loss": 0.009354,
+      "chamfer": 0.178216,
+      "seconds": 101.6,
+      "error": null
+     }
+    ]
+   },
+   "teardrop": {
+    "attempts": [
+     {
+      "params": [
+       1.0,
+       3.5,
+       3.0,
+       4.5,
+       2.5,
+       1.0,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": true,
+      "index_loss": 0.185945,
+      "chamfer": 0.301449,
+      "seconds": 106.3,
+      "error": null
+     },
+     {
+      "params": [
+       0.8,
+       2.1,
+       2.1,
+       4.0,
+       0.0,
+       -0.9,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": false,
+      "index_loss": 10.0,
+      "chamfer": 10.0,
+      "seconds": 102.4,
+      "error": null
+     },
+     {
+      "params": [
+       0.5,
+       1.5,
+       1.5,
+       2.5,
+       0.0,
+       1.0,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": true,
+      "index_loss": 0.152073,
+      "chamfer": 0.320516,
+      "seconds": 147.7,
+      "error": null
+     }
+    ]
+   },
+   "infinity": {
+    "attempts": [
+     {
+      "params": [
+       0.5,
+       1.5,
+       1.5,
+       3.0,
+       1.0,
+       0.0,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": false,
+      "index_loss": 10.0,
+      "chamfer": 10.0,
+      "seconds": 98.2,
+      "error": null
+     },
+     {
+      "params": [
+       0.5,
+       1.5,
+       1.5,
+       3.0,
+       0.5,
+       -0.5,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": false,
+      "index_loss": 10.0,
+      "chamfer": 10.0,
+      "seconds": 92.9,
+      "error": null
+     },
+     {
+      "params": [
+       1.0,
+       2.5,
+       2.0,
+       2.5,
+       1.5,
+       0.0,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": true,
+      "index_loss": 0.282434,
+      "chamfer": 0.215825,
+      "seconds": 100.4,
+      "error": null
+     }
+    ]
+   },
+   "figure8": {
+    "attempts": [
+     {
+      "params": [
+       0.9,
+       1.5,
+       1.4,
+       2.0,
+       0.8,
+       0.5,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": false,
+      "index_loss": 10.0,
+      "chamfer": 10.0,
+      "seconds": 96.6,
+      "error": null
+     },
+     {
+      "params": [
+       0.45,
+       1.25,
+       1.05,
+       2.5,
+       0.5,
+       -0.5,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": false,
+      "index_loss": 10.0,
+      "chamfer": 10.0,
+      "seconds": 93.9,
+      "error": null
+     },
+     {
+      "params": [
+       0.7,
+       1.5,
+       1.4,
+       2.5,
+       0.8,
+       0.1,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": false,
+      "index_loss": 10.0,
+      "chamfer": 10.0,
+      "seconds": 101.2,
+      "error": null
+     }
+    ]
+   },
+   "heart": {
+    "attempts": [
+     {
+      "params": [
+       0.5,
+       1.5,
+       1.5,
+       3.0,
+       0.5,
+       -0.5,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": false,
+      "index_loss": 10.0,
+      "chamfer": 10.0,
+      "seconds": 98.0,
+      "error": null
+     },
+     {
+      "params": [
+       0.616,
+       1.645,
+       1.645,
+       2.8,
+       0.0,
+       1.645,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": false,
+      "index_loss": 10.0,
+      "chamfer": 10.0,
+      "seconds": 91.4,
+      "error": null
+     },
+     {
+      "params": [
+       0.8,
+       1.7,
+       1.2,
+       2.0,
+       0.0,
+       1.0,
+       -1.0
+      ],
+      "parse_ok": true,
+      "valid": true,
+      "index_loss": 0.091422,
+      "chamfer": 0.073525,
+      "seconds": 95.4,
+      "error": null
+     }
+    ]
+   },
+   "star": {
+    "attempts": [
+     {
+      "params": [
+       1.0,
+       3.0,
+       2.5,
+       4.0,
+       1.5,
+       -0.5,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": true,
+      "index_loss": 0.157611,
+      "chamfer": 0.143261,
+      "seconds": 88.7,
+      "error": null
+     },
+     {
+      "params": null,
+      "parse_ok": false,
+      "valid": false,
+      "index_loss": 10.0,
+      "chamfer": 10.0,
+      "seconds": 75.7,
+      "error": null
+     },
+     {
+      "params": [
+       0.5,
+       1.5,
+       1.2,
+       2.5,
+       0.0,
+       0.5,
+       1.0
+      ],
+      "parse_ok": true,
+      "valid": false,
+      "index_loss": 10.0,
+      "chamfer": 10.0,
+      "seconds": 76.1,
+      "error": null
+     }
+    ]
+   }
+  }
+ },
+ "de": {},
+ "meta": {
+  "started": "2026-08-31 15:56:03"
+ }
+}

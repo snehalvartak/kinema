@@ -1,0 +1,5 @@
+.env
+__pycache__/
+*.pyc
+prototype/__pycache__/
+benchmark/results.json.bak
