@@ -92,3 +92,15 @@ footer strong { color: var(--ink); }
 .topbar { display: flex; gap: 14px; justify-content: center; padding: 16px; }
 .topbar a { color: var(--blue); text-decoration: none; border: 1px solid var(--edge); padding: 6px 16px; border-radius: 999px; font-size: 14px; }
 .topbar a:hover { border-color: var(--blue); }
+
+.progress {
+  margin-top: 10px; height: 6px; border-radius: 3px; background: #10151b;
+  border: 1px solid var(--edge); overflow: hidden;
+}
+#bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--blue), var(--red));
+  transition: width 0.25s ease;
+}
+.speed { display: flex; gap: 4px; margin-left: auto; }
+.speed-chip.selected { color: var(--ink); border-color: var(--blue); background: #16202c; }

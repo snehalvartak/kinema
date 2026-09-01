@@ -90,7 +90,20 @@ $("clear").onclick = clearDraw;
 
 // ---------- worker ----------
 let running = false, frames = null, animId = null, lastPoints = null, genStart = null, lastGenTime = null;
-let worker = null;
+let worker = null, totalGens = 320, speed = "full";
+
+// speed control
+for (const b of document.querySelectorAll(".speed-chip")) {
+  b.onclick = () => {
+    if (running) return;
+    speed = b.dataset.speed;
+    for (const x of document.querySelectorAll(".speed-chip")) x.classList.toggle("selected", x === b);
+  };
+}
+const SPEED_CFG = {
+  fast: { generations: 120, popsize: 120 },
+  full: { generations: 320, popsize: 200 },
+};
 
 function setRunning(v) {
   running = v;
@@ -98,6 +111,7 @@ function setRunning(v) {
   $("evolve").textContent = v ? "Evolving…" : "Invent my machine";
   $("doneRow").hidden = true;
   $("legend").hidden = true;
+  $("bar").style.width = "0%";
 }
 function narrate(html) { $("narration").innerHTML = html; }
 
@@ -151,6 +165,13 @@ function drawSpark() {
 
 function startWorker(points) {
   if (worker) worker.terminate();
+  lossHist = [];
+  genStart = null;
+  lastGenTime = null;
+  totalGens = SPEED_CFG[speed].generations;
+  if (animId) cancelAnimationFrame(animId);
+  sctx.clearRect(0, 0, stageCv.width, stageCv.height);
+  $("stageTitle").textContent = "2 · Watch the evolution";
   worker = new Worker("engine.worker.js");
   worker.onmessage = (e) => {
     const m = e.data;
@@ -159,20 +180,22 @@ function startWorker(points) {
       if (genStart === null) genStart = now;
       if (lastGenTime !== null && m.gen > 0) {
         const rate = (now - lastGenTime) / 6;
-        $("time").textContent = "eta ~" + Math.max(0, ((320 - m.gen) * rate) / 1000).toFixed(0) + "s";
+        $("time").textContent = "eta ~" + Math.max(0, ((totalGens - m.gen) * rate) / 1000).toFixed(0) + "s";
       }
       lastGenTime = now;
       $("gen").textContent = "gen " + m.gen;
+      $("bar").style.width = Math.min(100, (m.gen / totalGens) * 100).toFixed(1) + "%";
       $("loss").textContent = m.loss.toFixed(4);
       $("match").textContent = Math.max(0, (1 - m.loss) * 100).toFixed(1) + "%";
       lossHist.push(m.loss);
       drawSpark();
       drawEvolution(lastPoints, m.curve);
-      narrate(`<strong>Generation ${m.gen}.</strong> 200 random machines were mutated and tested in your browser.
+      narrate(`<strong>Generation ${m.gen}.</strong> ${SPEED_CFG[speed].popsize} random machines were mutated and tested in your browser.
         The red path is the best machine's pen so far &mdash; watch it hug your sketch
         (dashed). Machines that trace it better survive; the rest are discarded.`);
     } else if (m.type === "done") {
       frames = m;
+      $("bar").style.width = "100%";
       $("time").textContent = ((performance.now() - genStart) / 1000).toFixed(1) + "s";
       $("match").textContent = Math.max(0, (1 - m.loss) * 100).toFixed(1) + "%";
       const L = m.links, tr = m.transmission;
@@ -190,7 +213,7 @@ function startWorker(points) {
       setRunning(false);
     }
   };
-  worker.postMessage({ points, cfg: { generations: 320, popsize: 200, seed: 42 } });
+  worker.postMessage({ points, cfg: { ...SPEED_CFG[speed], seed: 42 } });
 }
 
 $("evolve").onclick = () => {

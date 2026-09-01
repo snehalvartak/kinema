@@ -24,6 +24,10 @@
     <div class="row">
       <button id="evolve" class="primary">Invent my machine</button>
       <button id="clear">Clear</button>
+      <div class="speed" id="speedCtl">
+        <button class="chip speed-chip" data-speed="fast">Fast demo</button>
+        <button class="chip speed-chip selected" data-speed="full">Thorough</button>
+      </div>
     </div>
     <p class="hint">or draw with your mouse &mdash; the curve closes automatically</p>
   </section>
@@ -31,6 +35,7 @@
   <section class="panel" id="stagePanel">
     <h2 id="stageTitle">2 &middot; Watch the evolution</h2>
     <canvas id="stage" width="520" height="520"></canvas>
+    <div class="progress"><div id="bar"></div></div>
     <p id="narration" class="narration">Draw a curve on the left (or click a preset), then press <strong>“Invent my machine”</strong>.</p>
     <div class="legend" id="legend" hidden>
       <span class="lg"><i style="background:#5aa2ff"></i>crank (rotates)</span>

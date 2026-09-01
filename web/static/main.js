@@ -103,7 +103,20 @@ $("clear").onclick = clearDraw;
 
 // ---------- websocket + evolution ----------
 let ws = null, running = false, frames = null, animId = null, lastPoints = null;
-let genStart = null, lastGenTime = null;
+let genStart = null, lastGenTime = null, totalGens = 320, speed = "full";
+
+// speed control
+for (const b of document.querySelectorAll(".speed-chip")) {
+  b.onclick = () => {
+    if (running) return;
+    speed = b.dataset.speed;
+    for (const x of document.querySelectorAll(".speed-chip")) x.classList.toggle("selected", x === b);
+  };
+}
+const SPEED_CFG = {
+  fast: { generations: 120, popsize: 120, restarts: 1 },   // ~6-10s
+  full: { generations: 320, popsize: 200, restarts: 2 },   // ~25-45s
+};
 
 function setRunning(v) {
   running = v;
@@ -111,6 +124,7 @@ function setRunning(v) {
   $("evolve").textContent = v ? "Evolving…" : "Invent my machine";
   $("doneRow").hidden = true;
   $("legend").hidden = true;
+  $("bar").style.width = "0%";
 }
 
 function narrate(html) { $("narration").innerHTML = html; }
@@ -173,24 +187,27 @@ function connect() {
       const now = performance.now();
       if (genStart === null) genStart = now;
       if (lastGenTime !== null && m.gen > 0) {
-        const rate = (now - lastGenTime) / 6;      // ms per generation
-        const remaining = (320 - m.gen) * rate;
+        const rate = (now - lastGenTime) / 4;      // ms per generation
+        const remaining = (totalGens - m.gen) * rate;
         $("time").textContent = "eta ~" + Math.max(0, remaining / 1000).toFixed(0) + "s";
       }
       lastGenTime = now;
       $("gen").textContent = "gen " + m.gen;
+      $("bar").style.width = Math.min(100, (m.gen / totalGens) * 100).toFixed(1) + "%";
       $("loss").textContent = m.loss.toFixed(4);
       $("match").textContent = Math.max(0, (1 - m.loss) * 100).toFixed(1) + "%";
       lossHist.push(m.loss);
       drawSpark();
       drawEvolution(lastPoints ? m.curve : m.curve, m.curve, m.gen, m.loss);
-      narrate(m.replay
-        ? `<strong>Replaying a cached result</strong> (this preset was already evolved once) &mdash; the machine was invented in a previous run; here it is again.`
-        : `<strong>Generation ${m.gen}.</strong> 200 random machines were mutated and tested.
+      narrate(m.warm
+        ? `<strong>Generation ${m.gen}.</strong> Warm start: the population was seeded with the machine from your previous run, so evolution converges faster &mdash; watch it refine.
+        Red path = best machine's pen; dashed = your sketch.`
+        : `<strong>Generation ${m.gen}.</strong> ${SPEED_CFG[speed].popsize} random machines were mutated and tested.
         The red path is the best machine's pen so far &mdash; watch it hug your sketch
         (dashed). Machines that trace it better survive; the rest are discarded.`);
     } else if (m.type === "done") {
       frames = m;
+      $("bar").style.width = "100%";
       $("time").textContent = m.elapsed.toFixed(1) + "s";
       $("match").textContent = Math.max(0, (1 - m.loss) * 100).toFixed(1) + "%";
       const L = m.links;
@@ -201,9 +218,9 @@ function connect() {
       $("doneRow").hidden = false;
       setRunning(false);
       startAnimation(m);
-      narrate(`<strong>Evolution finished in ${m.elapsed.toFixed(1)}s.</strong> Your machine was
+      narrate(`<strong>Evolution finished in ${m.elapsed.toFixed(1)}s${m.warm ? " (warm-started)" : ""}.</strong> Your machine was
         <em>invented, not programmed</em>: four bars and one pen point, found by mutating and
-        selecting machines. The crank (blue) spins; the pen (red) draws your curve. Full path = faint red; your sketch = dashed.`);
+        selecting machines. The crank (blue) spins; the pen (red) draws your curve. Faint red = full path; dashed = your sketch.`);
     } else if (m.type === "error") {
       console.error(m.message);
       setRunning(false);
@@ -240,7 +257,9 @@ function startSynthesis(points) {
   const ghost = points.map((p) => { const q = tf0(p); return [(p[0] - 260) / 240, (p[1] - 260) / 240]; });
   drawEvolution(ghost, null, 0, null);
   const seed = presetName ? 42 : Math.floor(Math.random() * 1e9);
-  ws.send(JSON.stringify({ type: "synthesize", points: points, generations: 320, popsize: 200, restarts: 2, seed: seed }));
+  const cfg = SPEED_CFG[speed];
+  totalGens = cfg.generations;
+  ws.send(JSON.stringify({ type: "synthesize", points: points, ...cfg, seed: seed }));
 }
 
 $("gifBtn").onclick = () => {

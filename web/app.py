@@ -67,27 +67,27 @@ def run_synthesis_stream(points, cfg, send, cancel: CancelFlag):
     key = preset_key(points, cfg)
     with PRESET_LOCK:
         cached = PRESET_CACHE.get(key)
+    seed_pop = None
+    warm = False
     if cached is not None:
-        # replay the cached result at high speed (honest: labeled as replay)
-        for i in range(0, len(cached["history"]), 3):
-            send({"type": "gen", "gen": i, "loss": round(cached["history"][i], 6),
-                  "curve": cached["curve"], "replay": True})
-            time.sleep(0.04)
-        send(cached | {"replay": True})
-        return
+        # warm start: seed the population with the previous winner — evolution still
+        # runs live and streams, it just starts from a much better place
+        seed_pop = [cached["params"]]
+        warm = True
 
     def on_generation(gen, best_params, best_loss):
         if cancel.cancelled:
             raise KeyboardInterrupt
-        # throttle: send ~ every 6 generations
-        if gen % 6 == 0 or gen == cfg["generations"] - 1:
+        # throttle: send ~ every 4 generations
+        if gen % 4 == 0 or gen == cfg["generations"] - 1:
             c, _ = curves(best_params[None, :])
             curve = c[0]
             send({"type": "gen", "gen": gen, "loss": round(best_loss, 6),
-                  "curve": np.round(curve, 5).tolist()})
+                  "curve": np.round(curve, 5).tolist(), "warm": warm})
 
     out = synthesize(points, generations=cfg["generations"], popsize=cfg["popsize"],
-                     seed=cfg["seed"], restarts=cfg["restarts"], on_generation=on_generation)
+                     seed=cfg["seed"], restarts=cfg["restarts"], on_generation=on_generation,
+                     seed_population=seed_pop)
     frames = linkage_frames(out["params"])
     target_machine = align_target_to_machine(out["curve"], points)
     payload = {
@@ -96,6 +96,7 @@ def run_synthesis_stream(points, cfg, send, cancel: CancelFlag):
         "loss": out["loss"],
         "chamfer": out["chamfer"],
         "elapsed": out["elapsed"],
+        "warm": warm,
         "history": out["history"][::4],
         "curve": np.round(out["curve"], 5).tolist(),
         "target": np.round(out["target"], 5).tolist(),
