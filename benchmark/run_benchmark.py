@@ -85,7 +85,7 @@ def score_params(params, target_norm):
     cn = normalize_batch(c2d)[0]
     zc = cn[:, 0] + 1j * cn[:, 1]
     zt = target_norm[:, 0] + 1j * target_norm[:, 1]
-    corr_zt = np.conj(np.fft.fft(zt))
+    corr_zt = np.fft.fft(zt)
     best = 1e9
     for x in (zc, np.conj(zc[::-1])):
         corr = np.fft.ifft(np.conj(np.fft.fft(x)) * corr_zt)

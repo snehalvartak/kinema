@@ -121,10 +121,14 @@ def resample(points: np.ndarray, n: int = N) -> np.ndarray:
 
 
 def prepare_target(points: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """Normalize a raw sketch into the target complex sequence + its FFT (for correlation)."""
+    """Normalize a raw sketch into the target complex sequence + its FFT (for correlation).
+
+    Uses fft(zt) (NOT conjugated): ifft(conj(fft(x))·fft(zt)) is the true circular
+    correlation sum_i conj(x[i])·zt[i+s].
+    """
     t = normalize_batch(resample(points)[None])[0]
     zt = t[:, 0] + 1j * t[:, 1]
-    return t, np.conj(np.fft.fft(zt))
+    return t, np.fft.fft(zt)
 
 
 def _sobol_population(popsize: int, rng: np.random.Generator) -> np.ndarray:
@@ -218,7 +222,10 @@ def synthesize(target_points: np.ndarray,
     r = minimize(f_obj, params, method="Nelder-Mead",
                  options={"maxiter": 1200, "xatol": 1e-6, "fatol": 1e-9})
     if r.fun < loss:
-        params, loss = np.clip(r.x, BOUNDS[:, 0], BOUNDS[:, 1]), float(r.fun)
+        cand = np.clip(r.x, BOUNDS[:, 0], BOUNDS[:, 1])
+        cand_loss = f_obj(cand)  # re-check AFTER clipping: clipping can break Grashof
+        if cand_loss < loss:
+            params, loss = cand, cand_loss
 
     # local polish stage 2: orderless chamfer loss (sharpens cusps, fixes correspondences)
     t_norm = normalize_batch(resample(target_points)[None])[0]
@@ -231,7 +238,10 @@ def synthesize(target_points: np.ndarray,
     r2 = minimize(f_cham, params, method="Nelder-Mead",
                   options={"maxiter": 800, "xatol": 1e-6, "fatol": 1e-9})
     if r2.fun < base_cham:
-        params = np.clip(r2.x, BOUNDS[:, 0], BOUNDS[:, 1])
+        cand = np.clip(r2.x, BOUNDS[:, 0], BOUNDS[:, 1])
+        cand_cham = f_cham(cand)  # re-check AFTER clipping
+        if cand_cham < base_cham and f_obj(cand) < BIG:
+            params = cand
     cham = f_cham(params)
     idx_after = f_obj(params)
 
@@ -253,30 +263,38 @@ def synthesize(target_points: np.ndarray,
 def align_target_to_machine(curve: np.ndarray, target_points: np.ndarray) -> np.ndarray:
     """Express the sketch target in the machine's coordinate frame (best shift+rotation+scale).
 
-    Used to overlay the user's sketch on the animated linkage.
+    Used to overlay the user's sketch on the animated linkage. Works with any curve
+    length (the target is resampled to match).
     """
-    rms = np.sqrt((curve ** 2).sum(axis=1).mean())
-    zn = normalize_batch(curve[None])[0]
+    cen = curve.mean(axis=0)
+    rms = np.sqrt(((curve - cen) ** 2).sum(axis=1).mean())
+    zn = normalize_batch(curve)
     zc = zn[:, 0] + 1j * zn[:, 1]
-    tn = normalize_batch(resample(target_points)[None])[0]
+    tn = normalize_batch(resample(target_points, len(curve)))
     zt = tn[:, 0] + 1j * tn[:, 1]
-    corr_fft_zt = np.conj(np.fft.fft(zt))
+    corr_fft_zt = np.fft.fft(zt)
+    # Two pairing hypotheses, both with clean rotations (no conjugation of x):
+    #   fwd: machine index i  <-> target index (i+s)  — num(s) = ifft(conj(fft(zt))·fft(zc))[s]
+    #   rev: machine index i  <-> target index (s-i)  — num(s) = ifft(fft(conj(zt))·fft(zc))[s]
+    # residual(s) = 2 - 2|num(s)|/N (unit-RMS curves); pick branch+shift with min residual.
+    # ghost:  tm[m] = R^-1 * zt[pair(m)] * rms + centroid,  R^-1 = num/|num|
+    num_fwd = np.fft.ifft(np.conj(corr_fft_zt) * np.fft.fft(zc))
+    num_rev = np.fft.ifft(np.fft.fft(np.conj(zt)) * np.fft.fft(zc))
+    cands = [("fwd", num_fwd, lambda m, s: (m + s) % N),
+             ("rev", num_rev, lambda m, s: (s - m) % N)]
     best = None
-    for x in (zc, np.conj(zc[::-1])):
-        corr = np.fft.ifft(np.conj(np.fft.fft(x)) * corr_fft_zt, axis=0) \
-            if x.ndim > 1 else np.fft.ifft(np.conj(np.fft.fft(x)) * corr_fft_zt)
-        s = int(np.argmax(np.abs(corr)))
-        m = np.abs(corr[s]) / len(zt)
-        if best is None or m > best[0]:
-            best = (m, s, x)
-    m, s, x = best
-    corr = np.fft.ifft(np.conj(np.fft.fft(x)) * corr_fft_zt)
-    w = np.roll(zt, -s)
-    num = np.sum(np.conj(w) * x)
-    R = np.conj(num) / max(abs(num), 1e-12)
-    # x*R matches the shifted target; so target in curve frame = roll(zt,-s) * conj(R)
-    tm = w * np.conj(R) * rms
-    return np.stack([tm.real, tm.imag], axis=1)
+    for label, nums, pair in cands:
+        s = int(np.argmax(np.abs(nums)))
+        mag = abs(nums[s]) / N
+        Rinv = nums[s] / max(abs(nums[s]), 1e-12)
+        res = 2.0 - 2.0 * min(mag, 1.0)
+        tm = np.empty(N, dtype=complex)
+        for m in range(N):
+            tm[m] = Rinv * zt[pair(m, s)] * rms
+        tm2 = np.stack([tm.real + cen[0], tm.imag + cen[1]], axis=1)
+        if best is None or res < best[0]:
+            best = (res, tm2, label)
+    return best[1]
 
 
 def linkage_frames(params) -> dict:

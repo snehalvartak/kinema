@@ -1332,23 +1332,9 @@
     1.6,
     -0.4231748448861823
    ],
-   "index_loss": 0.004571,
+   "index_loss": 0.005489,
    "chamfer": 0.00285,
    "seconds": 31.9
-  },
-  "teardrop": {
-   "params": [
-    0.340900427562832,
-    3.6,
-    0.7609756233473757,
-    4.2,
-    1.0048588640589022,
-    -0.7331520380710463,
-    -1.412248500550372e-05
-   ],
-   "index_loss": 0.015972,
-   "chamfer": 10.0,
-   "seconds": 28.8
   },
   "infinity": {
    "params": [
@@ -1360,23 +1346,9 @@
     -1.4712609843668036,
     0.5744676804594924
    ],
-   "index_loss": 0.018001,
+   "index_loss": 0.033083,
    "chamfer": 0.030095,
    "seconds": 27.1
-  },
-  "figure8": {
-   "params": [
-    1.1736525977864698,
-    1.238147573545711,
-    3.6,
-    4.017909357286509,
-    1.0267464816264562,
-    1.4287258968460277,
-    -0.5662611782675628
-   ],
-   "index_loss": 0.082645,
-   "chamfer": 10.0,
-   "seconds": 29.1
   },
   "heart": {
    "params": [
@@ -1388,7 +1360,7 @@
     -0.21278943381272677,
     0.10728128166527384
    ],
-   "index_loss": 0.035054,
+   "index_loss": 0.057006,
    "chamfer": 0.048609,
    "seconds": 48.0
   },
@@ -1402,9 +1374,37 @@
     5.018062754307739e-07,
     -4.98007827636025e-07
    ],
-   "index_loss": 0.043694,
+   "index_loss": 0.045997,
    "chamfer": 0.065411,
    "seconds": 32.0
+  },
+  "teardrop": {
+   "params": [
+    0.18505809330642914,
+    3.0778613287257506,
+    3.501549201190679,
+    0.6099670406226338,
+    -0.0254248474202345,
+    -0.11258659285108105,
+    -1.2734410020768604e-07
+   ],
+   "index_loss": 0.015972,
+   "chamfer": 0.044172,
+   "seconds": 179.6
+  },
+  "figure8": {
+   "params": [
+    1.2882513810838783,
+    1.6127445124776716,
+    1.6127510132970762,
+    1.847458483936011,
+    1.4213750850533735,
+    1.6,
+    -0.4766516092896098
+   ],
+   "index_loss": 0.082645,
+   "chamfer": 0.369802,
+   "seconds": 140.4
   }
  },
  "meta": {
@@ -1524,7 +1524,7 @@
       "seconds": 15.1
      }
     ],
-    "best_index_loss": 0.22926958620842974,
+    "best_index_loss": 0.2292695862084302,
     "best_params": [
      0.5,
      2.0,
@@ -1607,7 +1607,7 @@
       "seconds": 12.7
      }
     ],
-    "best_index_loss": 0.23514240290720423,
+    "best_index_loss": 0.23514240290720378,
     "best_params": [
      0.35,
      1.0,
@@ -1741,7 +1741,7 @@
       "seconds": 40.2
      }
     ],
-    "best_index_loss": 0.0213882061140942,
+    "best_index_loss": 0.021388206114093977,
     "best_params": [
      0.7,
      1.9,
@@ -1787,7 +1787,7 @@
       "seconds": 118.9
      }
     ],
-    "best_index_loss": 0.16955815862531987,
+    "best_index_loss": 0.1695581586253201,
     "best_params": [
      0.5,
      1.4,
@@ -2111,7 +2111,7 @@
       "seconds": 130.1
      }
     ],
-    "best_index_loss": 0.529715845048307,
+    "best_index_loss": 0.5297158450483068,
     "best_params": [
      0.5,
      1.5,
@@ -2157,7 +2157,7 @@
       "seconds": 129.8
      }
     ],
-    "best_index_loss": 0.05558090083336609,
+    "best_index_loss": 0.05558090083336564,
     "best_params": [
      1.0,
      2.5,
@@ -2274,7 +2274,7 @@
      0.481146
     ],
     "hybrid_small": {
-     "index_loss": 0.004571,
+     "index_loss": 0.00487,
      "chamfer": 0.00487,
      "params": [
       0.15,
@@ -2288,7 +2288,7 @@
      "seconds": 3.9
     },
     "hybrid_full": {
-     "index_loss": 0.004571,
+     "index_loss": 0.005489,
      "chamfer": 0.00285,
      "params": [
       0.15,
@@ -2358,7 +2358,7 @@
      0.282892
     ],
     "hybrid_small": {
-     "index_loss": 0.016302,
+     "index_loss": 0.034916,
      "chamfer": 0.053953,
      "params": [
       0.15,
@@ -2372,7 +2372,7 @@
      "seconds": 2.3
     },
     "hybrid_full": {
-     "index_loss": 0.015972,
+     "index_loss": 0.021192,
      "chamfer": 0.024973,
      "params": [
       0.34870227651901364,
@@ -2442,7 +2442,7 @@
      0.34745
     ],
     "hybrid_small": {
-     "index_loss": 0.018001,
+     "index_loss": 0.033083,
      "chamfer": 0.030095,
      "params": [
       0.528461195383059,
@@ -2456,7 +2456,7 @@
      "seconds": 1.8
     },
     "hybrid_full": {
-     "index_loss": 0.018001,
+     "index_loss": 0.033885,
      "chamfer": 0.031525,
      "params": [
       0.6396117959368223,
@@ -2526,7 +2526,7 @@
      0.423198
     ],
     "hybrid_small": {
-     "index_loss": 0.082738,
+     "index_loss": 0.429773,
      "chamfer": 0.233965,
      "params": [
       1.2360179866030507,
@@ -2540,7 +2540,7 @@
      "seconds": 2.7
     },
     "hybrid_full": {
-     "index_loss": 0.082645,
+     "index_loss": 0.092,
      "chamfer": 0.101599,
      "params": [
       0.7854310691865249,
@@ -2610,7 +2610,7 @@
      0.182971
     ],
     "hybrid_small": {
-     "index_loss": 0.03511,
+     "index_loss": 0.034856,
      "chamfer": 0.084114,
      "params": [
       2.0331324558920683,
@@ -2624,7 +2624,7 @@
      "seconds": 4.8
     },
     "hybrid_full": {
-     "index_loss": 0.035054,
+     "index_loss": 0.057006,
      "chamfer": 0.048609,
      "params": [
       0.15,
@@ -2694,7 +2694,7 @@
      0.456911
     ],
     "hybrid_small": {
-     "index_loss": 0.043694,
+     "index_loss": 0.045997,
      "chamfer": 0.06541,
      "params": [
       0.15,
@@ -2708,7 +2708,7 @@
      "seconds": 2.3
     },
     "hybrid_full": {
-     "index_loss": 0.043694,
+     "index_loss": 0.045997,
      "chamfer": 0.065411,
      "params": [
       0.2805024165958535,
@@ -2780,7 +2780,7 @@
      0.109342
     ],
     "hybrid_small": {
-     "index_loss": 0.004571,
+     "index_loss": 0.005007,
      "chamfer": 0.006731,
      "params": [
       0.15,
@@ -2794,7 +2794,7 @@
      "seconds": 1.8
     },
     "hybrid_full": {
-     "index_loss": 0.004571,
+     "index_loss": 0.005489,
      "chamfer": 0.00285,
      "params": [
       0.15,
@@ -2864,7 +2864,7 @@
      0.028164
     ],
     "hybrid_small": {
-     "index_loss": 0.016302,
+     "index_loss": 0.034916,
      "chamfer": 0.053953,
      "params": [
       0.15,
@@ -2878,7 +2878,7 @@
      "seconds": 2.1
     },
     "hybrid_full": {
-     "index_loss": 0.015972,
+     "index_loss": 0.02705,
      "chamfer": 0.031565,
      "params": [
       0.15,
@@ -2948,7 +2948,7 @@
      0.119368
     ],
     "hybrid_small": {
-     "index_loss": 0.019005,
+     "index_loss": 0.036462,
      "chamfer": 0.033863,
      "params": [
       0.6576936005967631,
@@ -2962,7 +2962,7 @@
      "seconds": 1.8
     },
     "hybrid_full": {
-     "index_loss": 0.018001,
+     "index_loss": 0.038329,
      "chamfer": 0.035543,
      "params": [
       0.667781962485537,
@@ -3032,7 +3032,7 @@
      0.474088
     ],
     "hybrid_small": {
-     "index_loss": 0.083056,
+     "index_loss": 0.100088,
      "chamfer": 0.106384,
      "params": [
       0.9317972230944436,
@@ -3046,7 +3046,7 @@
      "seconds": 2.5
     },
     "hybrid_full": {
-     "index_loss": 0.082645,
+     "index_loss": 0.092034,
      "chamfer": 0.101953,
      "params": [
       1.047475464880982,
@@ -3116,7 +3116,7 @@
      0.487016
     ],
     "hybrid_small": {
-     "index_loss": 0.035305,
+     "index_loss": 0.055613,
      "chamfer": 0.049591,
      "params": [
       0.15,
@@ -3130,7 +3130,7 @@
      "seconds": 7.2
     },
     "hybrid_full": {
-     "index_loss": 0.035054,
+     "index_loss": 0.057006,
      "chamfer": 0.048609,
      "params": [
       0.15,
@@ -3200,7 +3200,7 @@
      0.546366
     ],
     "hybrid_small": {
-     "index_loss": 0.043709,
+     "index_loss": 0.045997,
      "chamfer": 0.06541,
      "params": [
       0.15,
@@ -3214,7 +3214,7 @@
      "seconds": 2.4
     },
     "hybrid_full": {
-     "index_loss": 0.043694,
+     "index_loss": 0.045997,
      "chamfer": 0.065411,
      "params": [
       0.2805024165958535,
@@ -3286,7 +3286,7 @@
      0.052054
     ],
     "hybrid_small": {
-     "index_loss": 0.004571,
+     "index_loss": 0.007313,
      "chamfer": 0.023146,
      "params": [
       0.15,
@@ -3300,7 +3300,7 @@
      "seconds": 3.3
     },
     "hybrid_full": {
-     "index_loss": 0.004571,
+     "index_loss": 0.005489,
      "chamfer": 0.00285,
      "params": [
       0.15,
@@ -3370,7 +3370,7 @@
      0.360069
     ],
     "hybrid_small": {
-     "index_loss": 0.016302,
+     "index_loss": 0.034916,
      "chamfer": 0.053953,
      "params": [
       0.15,
@@ -3384,7 +3384,7 @@
      "seconds": 4.7
     },
     "hybrid_full": {
-     "index_loss": 0.015971,
+     "index_loss": 0.033723,
      "chamfer": 0.055159,
      "params": [
       0.15,
@@ -3454,7 +3454,7 @@
      10.0
     ],
     "hybrid_small": {
-     "index_loss": 0.019744,
+     "index_loss": 0.037592,
      "chamfer": 0.034886,
      "params": [
       0.6639843565044878,
@@ -3468,7 +3468,7 @@
      "seconds": 2.2
     },
     "hybrid_full": {
-     "index_loss": 0.018001,
+     "index_loss": 0.032539,
      "chamfer": 0.030232,
      "params": [
       0.6122028108591262,
@@ -3538,7 +3538,7 @@
      10.0
     ],
     "hybrid_small": {
-     "index_loss": 0.082804,
+     "index_loss": 10.0,
      "chamfer": 10.0,
      "params": [
       1.3443582148387794,
@@ -3552,7 +3552,7 @@
      "seconds": 2.3
     },
     "hybrid_full": {
-     "index_loss": 0.082645,
+     "index_loss": 0.114767,
      "chamfer": 0.158591,
      "params": [
       1.1518441948109621,
@@ -3622,7 +3622,7 @@
      0.130367
     ],
     "hybrid_small": {
-     "index_loss": 0.03519,
+     "index_loss": 10.0,
      "chamfer": 10.0,
      "params": [
       0.15,
@@ -3636,7 +3636,7 @@
      "seconds": 8.4
     },
     "hybrid_full": {
-     "index_loss": 0.035054,
+     "index_loss": 0.057006,
      "chamfer": 0.048609,
      "params": [
       0.15,
@@ -3706,7 +3706,7 @@
      0.129149
     ],
     "hybrid_small": {
-     "index_loss": 0.043709,
+     "index_loss": 0.045997,
      "chamfer": 0.06541,
      "params": [
       0.15,
@@ -3720,7 +3720,7 @@
      "seconds": 3.1
     },
     "hybrid_full": {
-     "index_loss": 0.043694,
+     "index_loss": 0.045997,
      "chamfer": 0.065411,
      "params": [
       0.2805024165958535,

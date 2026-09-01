@@ -7,7 +7,7 @@ const drawCv = $("draw"), stageCv = $("stage"), sparkCv = $("spark");
 const dctx = drawCv.getContext("2d"), sctx = stageCv.getContext("2d"), kctx = sparkCv.getContext("2d");
 
 const PRESETS = {
-  heart: (t) => [16 * Math.sin(t) ** 3, -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16],
+  heart: (t) => [(16 * Math.sin(t) ** 3) / 16, -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16],
   infinity: (t) => [Math.cos(t) / (1 + Math.sin(t) ** 2), Math.sin(t) * Math.cos(t) / (1 + Math.sin(t) ** 2)],
   teardrop: (t) => [Math.sin(t) * (1 - Math.cos(t)), (1 - Math.cos(t))],
   figure8: (t) => [Math.sin(2 * t) * 0.7, Math.sin(t)],

@@ -1,0 +1,13 @@
+﻿const fs = require("fs");
+let code = fs.readFileSync("docs/engine.worker.js", "utf8");
+code += "\nglobalThis.__align = alignTargetToMachine;";
+global.self = { postMessage: () => {} };
+(0, eval)(code);
+const f = (t) => [Math.cos(t)/(1+Math.sin(t)**2), Math.sin(t)*Math.cos(t)/(1+Math.sin(t)**2)];
+const pts = Array.from({length:220},(_,i)=>{const [x,y]=f(i/220*2*Math.PI);return [x*2,y*2];});
+const messages = [];
+global.self.postMessage = (m)=>messages.push(m);
+global.self.onmessage({ data: { points: pts, cfg: { generations: 320, popsize: 200, seed: 42 } } });
+const r = messages.find(m=>m.type==="done");
+fs.writeFileSync("prototype/inf_debug.json", JSON.stringify({curve: r.curve, tm: r.target_machine, loss: r.loss}));
+console.log("exported, loss:", r.loss.toFixed(4));

@@ -172,9 +172,11 @@ function synthesize(points, cfg, onGen) {
   const tr = new Float64Array(N), ti = new Float64Array(N);
   for (let i = 0; i < N; i++) { tr[i] = target[i][0]; ti[i] = target[i][1]; }
   // conj(fft(target))
+  // true circular correlation: c[s] = sum_i conj(x[i])·zt[i+s]
+  // (fft(zt) UNconjugated — the conjugated variant is a different, mirrored metric)
   const tfr = Float64Array.from(tr), tfi = Float64Array.from(ti);
   fft(tfr, tfi, false);
-  const corrRe = Float64Array.from(tfr), corrIm = Float64Array.from(tfi).map((v) => -v);
+  const corrRe = Float64Array.from(tfr), corrIm = Float64Array.from(tfi);
 
   const curveBuf = new Float64Array(2 * N);
   const pop = [], fit = new Float64Array(popsize);
@@ -262,51 +264,8 @@ function synthesize(points, cfg, onGen) {
     const g = (Math.acos(Math.max(-1, Math.min(1, Math.abs((bx * rx + by * ry) / (blen * rlen))))) * 180) / Math.PI;
     gmin = Math.min(gmin, g); gsum += g;
   }
-  // target in machine frame: normalize target, rotate to match curve, scale by curve rms
-  const cn = normalizePts(curve);
-  let rmsC = 0;
-  { let mx = 0, my = 0; for (const p of curve) { mx += p[0]; my += p[1]; } mx /= N; my /= N;
-    let ss = 0; for (const p of curve) ss += (p[0] - mx) ** 2 + (p[1] - my) ** 2;
-    rmsC = Math.sqrt(ss / N); }
-  const zc = cn.map((p) => ({ re: p[0], im: p[1] }));
-  const zt = target.map((p) => ({ re: p[0], im: p[1] }));
-  // find best shift+rotation mapping curve -> target, then invert to place target on machine
-  let bestShift = 0, bestMag = -1, bestRev = false;
-  for (const rev of [false, true]) {
-    const xr = new Float64Array(N), xi = new Float64Array(N);
-    for (let i = 0; i < N; i++) {
-      const j = rev ? N - 1 - i : i;
-      xr[i] = zc[j].re; xi[i] = zc[j].im;
-    }
-    const c = xcorr(xr, xi, corrRe, corrIm);
-    for (let s = 0; s < N; s++) {
-      const m = Math.hypot(c.re[s], c.im[s]);
-      if (m > bestMag) { bestMag = m; bestShift = s; bestRev = rev; }
-    }
-  }
-  // target_machine[i] corresponds to machine angle i: roll target so it starts where pen starts
-  const tm = [];
-  {
-    // rotation aligning normalized curve to target: R = conj(sum conj(w) x)/|..| with w = roll(zt,-s)
-    const xr = new Float64Array(N), xi = new Float64Array(N);
-    for (let i = 0; i < N; i++) {
-      const j = bestRev ? N - 1 - i : i;
-      xr[i] = zc[j].re; xi[i] = zc[j].im;
-    }
-    const wr = new Float64Array(N), wi = new Float64Array(N);
-    for (let i = 0; i < N; i++) { wr[i] = zt[(i + bestShift) % N].re; wi[i] = zt[(i + bestShift) % N].im; }
-    let nr = 0, ni = 0;
-    for (let i = 0; i < N; i++) { nr += wr[i] * xr[i] + wi[i] * xi[i]; ni += wr[i] * xi[i] - wi[i] * xr[i]; }
-    const mag = Math.hypot(nr, ni) || 1e-9;
-    const Rr = nr / mag, Ri = -ni / mag;  // conj(num)/|num|
-    // machine-frame target point i: rotate normalized target point (i+shift) by conj(R), scale rms, reverse if needed
-    for (let i = 0; i < N; i++) {
-      const j = bestRev ? (N - i) % N : (i + bestShift) % N;
-      const zx = zt[j].re, zy = zt[j].im;
-      const qx = zx * Rr - zy * Ri, qy = zx * Ri + zy * Rr;
-      tm.push([qx * rmsC, qy * rmsC]);
-    }
-  }
+  // target in machine frame (see alignTargetToMachine)
+  const tm = alignTargetToMachine(curve, points);
 
   return {
     params: Array.from(best), loss: bl, valid: valid && okAll,
@@ -317,6 +276,70 @@ function synthesize(points, cfg, onGen) {
     transmission: { min_deg: gmin, mean_deg: gsum / N },
     frames: { A, B, P, O2, O4 },
   };
+}
+
+// Python-aligned helper: express target in the machine frame (port of align_target_to_machine)
+function ifftProduct(ar, ai, br, bi) {  // ifft(A·B) for complex arrays
+  const n = ar.length;
+  const pr = new Float64Array(n), pi = new Float64Array(n);
+  for (let k = 0; k < n; k++) {
+    pr[k] = ar[k] * br[k] - ai[k] * bi[k];
+    pi[k] = ar[k] * bi[k] + ai[k] * br[k];
+  }
+  fft(pr, pi, true);
+  return { re: pr, im: pi };
+}
+
+function alignTargetToMachine(curve, targetPoints) {
+  const Nc = curve.length;
+  let mx = 0, my = 0;
+  for (const p of curve) { mx += p[0]; my += p[1]; }
+  mx /= Nc; my /= Nc;
+  let ss = 0;
+  for (const p of curve) ss += (p[0] - mx) ** 2 + (p[1] - my) ** 2;
+  const rms = Math.sqrt(ss / Nc);
+  const cn = normalizePts(curve);
+  const zc = cn.map((p) => ({ re: p[0], im: p[1] }));
+  const tn = normalizePts(resample(targetPoints, Nc));
+  const zt = tn.map((p) => ({ re: p[0], im: p[1] }));
+
+  const FztR = Float64Array.from(zt.map((p) => p.re)), FztI = Float64Array.from(zt.map((p) => p.im));
+  fft(FztR, FztI, false);
+  const FzcR = Float64Array.from(zc.map((p) => p.re)), FzcI = Float64Array.from(zc.map((p) => p.im));
+  fft(FzcR, FzcI, false);
+  const FczR = Float64Array.from(ztr_cache(zt)), FczI = Float64Array.from(zt.map((p) => -p.im));
+  fft(FczR, FczI, false);
+
+  // num_fwd = ifft(conj(fft(zt))·fft(zc));  num_rev = ifft(fft(conj(zt))·fft(zc))
+  const numFwd = ifftProduct(
+    Float64Array.from(FztR, (v) => -v), FztI, FzcR, FzcI);
+  const numRev = ifftProduct(FczR, FczI, FzcR, FzcI);
+
+  let bestRes = 1e18, bestTm = null;
+  for (const [label, nums, pair] of [
+    ["fwd", numFwd, (m, s) => (m + s) % Nc],
+    ["rev", numRev, (m, s) => ((s - m) % Nc + Nc) % Nc],
+  ]) {
+    let bm = -1, bs = 0;
+    for (let s = 0; s < Nc; s++) {
+      const m = Math.hypot(nums.re[s], nums.im[s]);
+      if (m > bm) { bm = m; bs = s; }
+    }
+    const mag = bm / Nc;
+    const RinvR = nums.re[bs] / (bm || 1e-12), RinvI = nums.im[bs] / (bm || 1e-12);
+    const res = 2 - 2 * Math.min(mag, 1);
+    const cand = [];
+    for (let m = 0; m < Nc; m++) {
+      const zx = zt[pair(m, bs)].re, zy = zt[pair(m, bs)].im;
+      cand.push([(zx * RinvR - zy * RinvI) * rms + mx, (zx * RinvI + zy * RinvR) * rms + my]);
+    }
+    if (res < bestRes) { bestRes = res; bestTm = cand; }
+  }
+  return bestTm;
+}
+
+function ztr_cache(zt) {
+  return Float64Array.from(zt.map((p) => p.re));
 }
 
 self.onmessage = (e) => {
